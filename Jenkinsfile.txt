@@ -1,0 +1,79 @@
+// Jenkinsfile
+pipeline {
+    agent any // Instructs Jenkins to use any available agent/node
+
+    environment {
+        // Define a virtual environment directory name
+        VENV = 'venv' 
+        // Set the path to the Python executable inside the venv
+        PYTHON_HOME = "./${VENV}/bin/python" 
+        // Set Flask app entry point for deployment stage
+        FLASK_APP = 'app.py'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // By default, 'checkout scm' fetches the code from the linked repository
+                echo 'Checking out source code...'
+                checkout scm
+            }
+        }
+
+        stage('Setup Python Environment') {
+            steps {
+                echo 'Setting up Python Virtual Environment and installing dependencies...'
+                // Create the virtual environment
+                sh "python3 -m venv ${VENV}"
+                // Install all dependencies from the requirements.txt
+                sh "${PYTHON_HOME} -m pip install --upgrade pip"
+                sh "${PYTHON_HOME} -m pip install -r requirements.txt"
+            }
+        }
+
+        stage('Run Unit & Integration Tests') {
+            steps {
+                echo 'Running pytest tests...'
+                // Run the tests defined in test_app.py
+                sh "${PYTHON_HOME} -m pytest" 
+            }
+            // Add a post-build step to publish test results (requires JUnit Plugin)
+            post {
+                always {
+                    // Assuming pytest-junit is used to generate a report.xml file
+                    // Use the 'archiveTestResults' step instead of this if you have the plugin
+                    // junit '**/reports/*.xml' 
+                    echo 'Test stage complete.'
+                }
+            }
+        }
+        
+        stage('Package/Build') {
+            steps {
+                echo 'Packaging the Python application as a source distribution (.tar.gz)...'
+                // For a simple package, you would create setup.py 
+                // and run: sh "${PYTHON_HOME} setup.py sdist bdist_wheel"
+                // For your Flask app, the "package" is simply the source code and dependencies.
+                // We will zip the necessary files for a simple "artifact".
+                sh "tar -czvf cicdclouds-app.tar.gz app.py requirements.txt templates/ static/"
+            }
+            // Archive the created package file (the artifact)
+            post {
+                success {
+                    archiveArtifacts artifacts: 'cicdclouds-app.tar.gz', fingerprint: true
+                }
+            }
+        }
+        
+        stage('Deployment Prep (WSGI/Gunicorn)') {
+            steps {
+                echo "This stage would deploy to a Python WSGI server (e.g., Gunicorn), NOT Tomcat."
+                echo "Deployment command would be: gunicorn --bind 0.0.0.0:8000 ${FLASK_APP}:app"
+                // This step is typically a call to an external tool (e.g., Ansible, kubectl, SSH)
+                // to push the artifact to a staging/production server.
+                // Example for a simple SSH deployment:
+                // sh "scp cicdclouds-app.tar.gz user@prod-server:/var/www/cicdclouds/"
+            }
+        }
+    }
+}

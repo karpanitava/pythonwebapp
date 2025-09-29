@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ lecture.title }}{% endblock %}
+{% block content %}
+
+    <h1>{{ lecture.title }}</h1>
+    <p><a href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a></p>
+
+    <div style="display: flex; gap: 20px;">
+        <div style="flex: 2;">
+            <h3>Video Lecture</h3>
+            <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
+                <iframe src="{{ lecture.video_url }}" 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                        frameborder="0" allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div style="flex: 1; background-color: white; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3>Your Notes</h3>
+            
+            <form method="POST" action="{{ url_for('lecture_view', lecture_id=lecture.id) }}">
+                <textarea name="note_content" rows="4" 
+                          placeholder="Type your notes here..." 
+                          style="width: 100%; padding: 8px; box-sizing: border-box; margin-bottom: 10px;" 
+                          required></textarea>
+                <button type="submit" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Note</button>
+            </form>
+            
+            <hr>
+
+            <h4>Saved Notes:</h4>
+            {% if notes %}
+                <ul style="list-style: none; padding: 0;">
+                    {% for note in notes %}
+                        <li style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                            <p>{{ note.content }}</p>
+                            <small style="color: #666;">Saved on: {{ note.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You haven't taken any notes for this lecture yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

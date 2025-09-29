@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login/Register{% endblock %}
+{% block content %}
+    <h2>Login or Register to CICDClouds</h2>
+
+    <h3>Login</h3>
+    <form method="POST" action="{{ url_for('login') }}">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Log In">
+    </form>
+    
+    <hr>
+
+    <h3>New User? Register</h3>
+    <form method="POST" action="{{ url_for('register') }}">
+        <label for="reg_username">Username:</label><br>
+        <input type="text" id="reg_username" name="username" required><br><br>
+        <label for="reg_password">Password:</label><br>
+        <input type="password" id="reg_password" name="password" required><br><br>
+        <input type="submit" value="Register">
+    </form>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <h2>Welcome to CICDClouds, {{ current_user.username }}!</h2>
+    <h3>Available Lectures:</h3>
+
+    {% if lectures %}
+        <ul style="list-style-type: none; padding: 0;">
+            {% for lecture in lectures %}
+                <li style="margin-bottom: 10px; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px;">
+                    <a href="{{ url_for('lecture_view', lecture_id=lecture.id) }}" 
+                       style="text-decoration: none; color: #007bff; font-size: 1.2em; font-weight: bold;">
+                        ▶️ {{ lecture.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No lectures have been added yet!</p>
+    {% endif %}
+
+{% endblock %}
