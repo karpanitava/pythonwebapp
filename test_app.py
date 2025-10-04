@@ -32,16 +32,19 @@ def test_dashboard_requires_login(client):
     assert '/login' in response.headers['Location']
 
 def test_login_with_valid_user(client):
-    """Test login flow with a valid user."""
     from app import db, User
     with flask_app.app_context():
-        user = User(username="testuser", password="testpass")
+        user = User(username="testuser")
+        user.set_password("testpass")
         db.session.add(user)
         db.session.commit()
 
-    response = client.post('/login', data={'username': 'testuser', 'password': 'testpass'})
-    assert response.status_code == 302  # Expect redirect after login
-    assert '/dashboard' in response.headers['Location']  # Assuming successful login redirects here
+        response = client.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        }, follow_redirects=True)
+
+        assert b'Logged in successfully!' in response.data
 
 # --- Optional: Selenium Functional Tests ---
 # NOTE: These should be placed in a separate file like test_ui.py
