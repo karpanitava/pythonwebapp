@@ -51,8 +51,8 @@ def test_login_with_valid_user(client):
 # and run against a live server instance.
 
 # from selenium import webdriver
-# def test_login_page_ui():
-#     driver = webdriver.Chrome()
-#     driver.get("http://localhost:5000/login")
-#     assert "Login or Register to CICDClouds" in driver.page_source
-#     driver.quit()
+ def test_login_page_ui():
+     driver = webdriver.Chrome()
+     driver.get("http://localhost:5000/login")
+     assert "Login or Register to CICDClouds" in driver.page_source
+     driver.quit()
